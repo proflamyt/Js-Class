@@ -2,13 +2,14 @@ import express, {Express ,Request, Response } from "express";
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import fs from "fs";
 const PORT: number = 8000;
+require('dotenv').config()
 
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "righteousnessakinbola@gmail.com",
-    pass: "ybfulqmjhkvfawmv",
+    user: process.env.USER,
+    pass: process.env.PASS
   },
 });
 
@@ -17,7 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/register", function (req: Request, res: Response) {
-  res.send(JSON.stringify({ result: "Register Here" }));
+  res.status(200)
+  .json({ result: "Register Here" });
 });
 
 app.post("/register", async function (req: any, res: any) {
@@ -41,7 +43,7 @@ app.post("/register", async function (req: any, res: any) {
   
 
     var mailOption = {
-      from: "righteousnessakinbola@gmail.com",
+      from: process.env.USER,
       to: email,
       subject: "Registration Confirmation",
       text: `Welcome ${username} your email is ${email}`,
