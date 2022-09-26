@@ -15,7 +15,7 @@ var transporter = nodemailer.createTransport({
 
 var app: Express = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 app.get("/register", function (req: Request, res: Response) {
   res.status(200)
@@ -40,7 +40,6 @@ app.post("/register", async function (req: any, res: any) {
       }
     );
 
-  
 
     var mailOption = {
       from: process.env.USER,
