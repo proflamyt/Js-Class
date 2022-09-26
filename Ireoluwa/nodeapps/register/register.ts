@@ -1,6 +1,7 @@
 import express, {Express ,Request, Response } from "express";
 import nodemailer, { SentMessageInfo } from "nodemailer";
 import fs from "fs";
+import cookieParser from "cookie-parser";
 const PORT: number = 8000;
 require('dotenv').config()
 
@@ -15,6 +16,7 @@ var transporter = nodemailer.createTransport({
 
 var app: Express = express();
 app.use(express.json());
+app.use(cookieParser())
 // app.use(express.urlencoded({ extended: true }));
 
 app.get("/register", function (req: Request, res: Response) {
@@ -22,18 +24,40 @@ app.get("/register", function (req: Request, res: Response) {
   .json({ result: "Register Here" });
 });
 
-app.post("/register", async function (req: any, res: any) {
-  const { email, username } = req.body;
+app.get("/register/user/email", function (req: Request, res: Response) {
+  fs.readFile('newlyRegistered.txt',  'utf8', (err:any, data:any)=>{
+    if (err){
+      console.log(err);
+      return;
+    }
+    var hehe = JSON.parse(data)
+    res.status(200)
+  .json({ result : hehe["email"] });
+  }) 
+});
 
+app.get("/register/user", function (req: Request, res: Response) {
+  res.status(200)
+  .json({ result : req.cookies['name_of_user'] });
+});
+
+
+app.post("/register", async function (req: Request, res: Response) {
+  const { email, username } = req.body;
+ 
   if (!email || !username) {
     res.status(400).json({
       message: "Enter all fields",
     });
   } else {
-    fs.appendFile(
+
+    res.cookie('name_of_user', `${username}`);
+
+   const newData = JSON.stringify({User : `${username}`,
+                    email : `${email}`})
+    fs.writeFile(
       "newlyRegistered.txt",
-      `
-               User: ${username} just registered with email: ${email} `,
+      `${newData}`,
       function (err: any) {
         if (err) throw err;
         console.log("User Saved!");
